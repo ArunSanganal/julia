@@ -1019,9 +1019,8 @@ export
 
     @assert,
     @atomic,
-    @atomic!,
-    @atomic_swap!,
-    @atomic_replace!,
+    @atomicswap,
+    @atomicreplace,
     @__dot__,
     @enum,
     @label,

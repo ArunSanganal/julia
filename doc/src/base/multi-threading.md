@@ -21,9 +21,8 @@ See also [Synchronization](@ref lib-task-sync).
 
 ```@docs
 Base.@atomic
-Base.@atomic!
-Base.@atomic_swap!
-Base.@atomic_replace!
+Base.@atomicswap
+Base.@atomicreplace
 ```
 
 !!! note

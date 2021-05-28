@@ -286,53 +286,53 @@ test_field_undef(ARefxy{UndefComplex{UndefComplex{Any}}})
 
 @test_throws ErrorException @macroexpand @atomic foo()
 @test_throws ErrorException @macroexpand @atomic foo += bar
-@test_throws ErrorException @macroexpand @atomic! foo += bar
-@test_throws ErrorException @macroexpand @atomic! foo = bar
-@test_throws ErrorException @macroexpand @atomic! foo()
-@test_throws ErrorException @macroexpand @atomic! foo(bar)
-@test_throws ErrorException @macroexpand @atomic! foo(bar, baz)
-@test_throws ErrorException @macroexpand @atomic! foo(bar, baz, bax)
-@test_throws ErrorException @macroexpand @atomic_replace! foo bar
+@test_throws ErrorException @macroexpand @atomic foo += bar
+@test_throws ErrorException @macroexpand @atomic foo = bar
+@test_throws ErrorException @macroexpand @atomic foo()
+@test_throws ErrorException @macroexpand @atomic foo(bar)
+@test_throws ErrorException @macroexpand @atomic foo(bar, baz)
+@test_throws ErrorException @macroexpand @atomic foo(bar, baz, bax)
+@test_throws ErrorException @macroexpand @atomicreplace foo bar
 
 # test macroexpansions
 let a = ARefxy(1, -1)
     @test 1 === @atomic a.x
-    @test 2 === @atomic! :sequentially_consistent a.x = 2
-    @test 3 === @atomic! :monotonic a.x = 3
-    @test_throws ConcurrencyViolationError @atomic! :not_atomic a.x = 2
+    @test 2 === @atomic :sequentially_consistent a.x = 2
+    @test 3 === @atomic :monotonic a.x = 3
+    @test_throws ConcurrencyViolationError @atomic :not_atomic a.x = 2
     @test_throws ConcurrencyViolationError @atomic :not_atomic a.x
-    @test_throws ConcurrencyViolationError @atomic! :not_atomic a.x += 1
+    @test_throws ConcurrencyViolationError @atomic :not_atomic a.x += 1
 
     @test 3 === @atomic :monotonic a.x
-    @test 5 === @atomic! a.x += 2
-    @test 4 === @atomic! :monotonic a.x -= 1
-    @test 12 === @atomic! :monotonic a.x *= 3
+    @test 5 === @atomic a.x += 2
+    @test 4 === @atomic :monotonic a.x -= 1
+    @test 12 === @atomic :monotonic a.x *= 3
 
     @test 12 === @atomic a.x
-    @test (12, 13) === @atomic! a.x + 1
-    @test (13, 15) === @atomic! :monotonic a.x + 2
-    @test (15, 19) === @atomic! a.x max 19
-    @test (19, 20) === @atomic! :monotonic a.x max 20
-    @test_throws ConcurrencyViolationError @atomic! :not_atomic a.x + 1
-    @test_throws ConcurrencyViolationError @atomic! :not_atomic a.x max 30
+    @test (12, 13) === @atomic a.x + 1
+    @test (13, 15) === @atomic :monotonic a.x + 2
+    @test (15, 19) === @atomic a.x max 19
+    @test (19, 20) === @atomic :monotonic a.x max 20
+    @test_throws ConcurrencyViolationError @atomic :not_atomic a.x + 1
+    @test_throws ConcurrencyViolationError @atomic :not_atomic a.x max 30
 
     @test 20 === @atomic a.x
-    @test 20 === @atomic_swap! a.x 1
-    @test 1 === @atomic_swap! :monotonic a.x 2
-    @test_throws ConcurrencyViolationError @atomic_swap! :not_atomic a.x 1
+    @test 20 === @atomicswap a.x 1
+    @test 1 === @atomicswap :monotonic a.x 2
+    @test_throws ConcurrencyViolationError @atomicswap :not_atomic a.x 1
 
     @test 2 === @atomic a.x
-    @test (2, true) === @atomic_replace! a.x 2 => 1
-    @test (1, false) === @atomic_replace! :monotonic a.x 2 => 1
-    @test (1, false) === @atomic_replace! :monotonic :monotonic a.x 2 => 1
-    @test_throws ConcurrencyViolationError @atomic_replace! :not_atomic a.x 1 => 2
-    @test_throws ConcurrencyViolationError @atomic_replace! :monotonic :acquire a.x 1 => 2
+    @test (2, true) === @atomicreplace a.x 2 => 1
+    @test (1, false) === @atomicreplace :monotonic a.x 2 => 1
+    @test (1, false) === @atomicreplace :monotonic :monotonic a.x 2 => 1
+    @test_throws ConcurrencyViolationError @atomicreplace :not_atomic a.x 1 => 2
+    @test_throws ConcurrencyViolationError @atomicreplace :monotonic :acquire a.x 1 => 2
 
     @test 1 === @atomic a.x
     xchg = 1 => 2
-    @test (1, true) === @atomic_replace! a.x xchg
-    @test (2, false) === @atomic_replace! :monotonic a.x xchg
-    @test (2, false) === @atomic_replace! :acquire_release :monotonic a.x xchg
-    @test_throws ConcurrencyViolationError @atomic_replace! :not_atomic a.x xchg
-    @test_throws ConcurrencyViolationError @atomic_replace! :monotonic :acquire a.x xchg
+    @test (1, true) === @atomicreplace a.x xchg
+    @test (2, false) === @atomicreplace :monotonic a.x xchg
+    @test (2, false) === @atomicreplace :acquire_release :monotonic a.x xchg
+    @test_throws ConcurrencyViolationError @atomicreplace :not_atomic a.x xchg
+    @test_throws ConcurrencyViolationError @atomicreplace :monotonic :acquire a.x xchg
 end
